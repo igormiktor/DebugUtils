@@ -126,7 +126,7 @@ namespace DebugUtils
     {
         public:
             DebugFileOnBase( std::true_type, const char* filename ) 
-                : mErrorLogFile{}, mOriginalCerrBuff{ nullptr }
+                : mDebugLogFile{}, mOriginalCerrBuff{ nullptr }
             {
                 auto t = std::time( nullptr );
                 auto tm = *std::localtime( &t );
@@ -135,12 +135,12 @@ namespace DebugUtils
                 
                 std::string fn{ filename };
                 fn += '_' + oss.str() + ".log";
-                mErrorLogFile.open( fn );
-                if ( mErrorLogFile )
+                mDebugLogFile.open( fn );
+                if ( mDebugLogFile )
                 {
                     mOriginalCerrBuff = std::cerr.rdbuf();          // Save cerr buffer to restore in destructor
-                    std::cerr.rdbuf( mErrorLogFile.rdbuf() );
-                    std::cerr << "Error logging redirected to file " << fn << std::endl;
+                    std::cerr.rdbuf( mDebugLogFile.rdbuf() );
+                    std::cerr << "Debug logging redirected to file " << fn << std::endl;
                 }
                 else
                 {
@@ -160,7 +160,7 @@ namespace DebugUtils
 
 
         private:
-            std::ofstream       mErrorLogFile;
+            std::ofstream       mDebugLogFile;
             std::streambuf*     mOriginalCerrBuff;
     };
 
