@@ -17,21 +17,22 @@ This code was an experiment to see how far modern C++20 tools can replace the pr
 generate code.  **It turns out I was able to entirely replace the preprocessor for this purpose.**
 
 There is no preprocessor selected code generation in DebugUtils.  The selection of what code is generated 
-(or not generated) is entirely governed by template specialization (helped along by type inference 
-by the compiler) and function overloading.  Certain template specializations and function overloads 
+(or not generated) is entirely governed by template specialization (helped along by the compiler's type inference) 
+and function overloading.  Certain template specializations and function overloads 
 generate debugging code; other template specializations and function overloads generate no code.
 
 When compiled on GCC v13 with -O2 and `DEBUGUTILS_ON=0`, code size is exactly the same as when all 
 DebugUtils debugging calls are manual editted out from the source code.
 
-Varidic template functions allow as many variables to be output as desired.  Template recursion
+Variadic template functions allow as many variables to be output as desired.  Template recursion
 enables the debug printing of complex nested data types and data structures (e.g., vectors of pairs, 
 lists of vectors, maps of strings, queues of tuples).
 
-A small number of preprocessor macros are provided to provide a way to conveniently capture __FILE__ and 
-__LINE__ at the point of calling the debugging functions.  If someone knows a way to do this without using 
-a macro function, let me know!  Note that none of these macros are conditional.  Another macro simply hides
-a simple but rote object instantiation (and is convenient, but absolutely not necessary).
+A small number of preprocessor macros are provided to provide a way to conveniently capture `__FILE__` and 
+`__LINE__` and produce a string concatenation of the arguments at the point of calling the debugging functions.  
+*If anyone knows a way to do this without using a macro function, please let me know!*  Note that none of these 
+macros are conditional.  A final macro simply hides a simple but rote object instantiation (it is a macro of 
+convenience, not of necessity). 
 
 ## Usage
 
