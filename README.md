@@ -30,9 +30,9 @@ lists of vectors, maps of strings, queues of tuples).
 
 A small number of preprocessor macros are provided to provide a way to conveniently capture `__FILE__` and 
 `__LINE__` and produce a string concatenation of the arguments at the point of calling the debugging 
-functions.  *If anyone knows a way to do this without using a macro function, please let me know!*  Note that none of these 
-macros are conditional.  A final macro simply hides a simple but rote object instantiation (it is a macro of 
-convenience, not of necessity). 
+functions.  *If anyone knows a way to do this without using a preprocessor macro, please let me know!*  Note 
+that none of these macros are conditional.  A final macro simply hides a simple but rote object 
+instantiation (it is a macro of convenience, not of necessity). 
 
 ## Usage
 
