@@ -173,18 +173,13 @@ namespace DebugUtils
 
 
 
-    // Following code uses template recursion on variadic function templates using
-    // the function print(...).
+    // Following code uses template recursion on variadic function templates. 
+    // The various functions print(...) provide the base case for template recursion.
 
-    // Helper concept/requirement
-    template <typename T>
-    concept is_iterable = requires( T &&x ) { begin(x); } &&
-                            !std::is_same_v<std::remove_cvref_t<T>, std::string>;
-
-
-    // The functions below handle single arguments, which provide the "base cases" for template recursion (the single argument case)
+    // The functions below handle single arguments, which provide the "base cases" for 
+    // template recursion. Base case in the context means the single argument case
     
-    // There handle specific types of single arguments base cases
+    // These handle specific types of single arguments base cases
     inline void print( const char* x )  { std::cerr << x; }
 
     inline void print( char x )  { std::cerr << "\'" << x << "\'"; }
@@ -195,7 +190,7 @@ namespace DebugUtils
 
     inline void print( std::vector<bool>& v )
     { 
-        // Overloaded this because stl optimizes vector<bool> by using
+        // This overload because stl optimizes vector<bool> by using
         // _Bit_reference instead of bool to conserve space.
         int f{ 0 };
         std::cerr << '{';
@@ -205,6 +200,11 @@ namespace DebugUtils
         }
         std::cerr << "}";
     }
+
+    // Helper concept/requirement processing the generic base case
+    template <typename T>
+    concept is_iterable = requires( T &&x ) { begin(x); } &&
+                            !std::is_same_v<std::remove_cvref_t<T>, std::string>;
 
     // This template handles all other single argument cases
     template <typename T>
@@ -228,7 +228,9 @@ namespace DebugUtils
                 int f{ 0 };
                 std::cerr << "{";
                 for ( auto&& i : x )
+                {
                     std::cerr << ( f++ ? "," : "" ), print( i );
+                }
                 std::cerr << "}";
             }
         }
@@ -238,11 +240,15 @@ namespace DebugUtils
             int f{ 0 };
             std::cerr << "{";
             if constexpr ( requires { x.top(); } )
+            {            
                 while ( !temp.empty() )
                     std::cerr << ( f++ ? "," : "" ), print( temp.top() ), temp.pop();
+            }
             else
+            {
                 while ( !temp.empty() )
                     std::cerr << ( f++ ? "," : "" ), print( temp.front() ), temp.pop();
+            }
             std::cerr << "}";
         }
         else if constexpr ( requires { x.first; x.second; } )           // Pair 
@@ -256,11 +262,16 @@ namespace DebugUtils
             std::cerr << ')';
         }
         else
+        {
             std::cerr << x;                                             // Anything else
+        }
     }
 
 
-    // This is the variadic function that drives the recursion
+    // This is the variadic function that drives the template recursion
+    // Single arguments are passed to one of the print() functions
+    // The "tail" argument(s) is/are passed back to the printer() 
+    // function (but with one less argument to trigger the template recursion)
     template <typename T, typename... V>
     void printer( const char* names, T&& head, V&&... tail )
     {
@@ -275,14 +286,19 @@ namespace DebugUtils
         std::cerr.write( names, i ) << " = ";
         print( head );
         if constexpr ( sizeof...(tail) )
+        {
             std::cerr << " ||", printer( names + i + 1, tail... );
+        }
         else
+        {    
             std::cerr << " ]\n";
+        }
     }
 
 
     // This a version of the variadic function for plain arrays 
     // Pass using macros as debugArr( array1Ptr, N1, array2Ptr, N2, array3Ptr, N3 )
+    // It works the same way as printer()
     template <typename T, typename... V>
     void printerArr( const char* names, T arr[], size_t n, V... tail )
     {
@@ -302,7 +318,8 @@ namespace DebugUtils
     }
 
 
-    // Following set-up the functions actually called by user code.  They are overloaded on the first parameter.
+
+    // Following sets up the functions actually called by user code.  They are overloaded on the first parameter.
     // When the first parameter is of type convertible to std::true_type, actual debug code is generated.
     // When the first parameter is convertible to std::false_type, empty functions (compiler eliminated) are generated.
 
@@ -351,6 +368,8 @@ namespace DebugUtils
 
     //*** debugMsg() variants ***
 
+    // This is a function to simply print a simple message to debug (no variables dumped)
+
     // Debugging version overload
     template<typename T>
     void debugMsg( std::true_type, const char* filename, int lineNbr, T output )
@@ -360,7 +379,7 @@ namespace DebugUtils
 
     // Non-debuging version overload
     template<typename T>
-    constexpr void debugMsg( std::false_type, const char*,  int , T ) {}
+    constexpr void debugMsg( std::false_type, const char*,  int, T ) {}
 
     // Function overload actually called in user code that triggers selection of debug/non-debug versions
     template <typename T>
@@ -369,14 +388,15 @@ namespace DebugUtils
         debugMsg( DebugUtilsPolicy{}, filename, lineNbr, msg );
     }
 
-}       // namespace DebugUtils
+}   // namespace DebugUtils
 
 
-// Convenience macros to facilitate use of __FILE__ and __LINE__ and catenation of variable names
+// Convenience macros to provide __FILE__, __LINE__ and the catenation of variable names
 #define debugV(...)         DebugUtils::debugPrinter( __FILE__,  __LINE__, #__VA_ARGS__, __VA_ARGS__ )
 #define debugArr(...)       DebugUtils::debugPrinterArr( __FILE__,  __LINE__, #__VA_ARGS__, __VA_ARGS__ )
 #define debugM( msg )       DebugUtils::debugMsg( __FILE__,  __LINE__, msg )
 
+// Convenience macro to instantiate a file to log all the debug output
 #define logDebugToFile( filename )      DebugUtils::DebugFileOn debugEnabled( filename )
 
 #endif  // DebugUtils_h
