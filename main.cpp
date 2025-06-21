@@ -16,11 +16,9 @@ int main( int, char** )
     std::cout << "C++ version is " << __cplusplus << std::endl;
     std::cout << "DebugUtils is " << ( DEBUGUTILS_ON ? "ON" : "OFF" ) << std::endl;
 
-    // Comment the next line out to send debug output to std::cerr
+    // Comment out the next line to send debug output to std::cerr
     DebugUtils::DebugFileOn debugFileEnabled( "Test_Log" );  
     // Above line could be replace by macro: logDebugToFile( "Test_Log" ) 
-
-    debugV( "This is a debug message" );
 
     std::string ex1 = "Test string";
     std::map<int, std::string> ex2 = { {1, "one"}, {2, "two"}, {3, "three"}, {4, "four"} };
@@ -31,6 +29,14 @@ int main( int, char** )
         { 21, 22, 23 },
         { 31, 32, 33 }
     };
+
+    // Make sure compiler in no-debug case doesn't strip everything out
+    std::cout << "ex1: " << ex1 << std::endl;
+    std::cout << "ex2[3]: " << ex2[3] << std::endl;
+    std::cout << "ex3.second: " << ex3.second << std::endl;
+    std::cout << "ex4[1][1]: " << ex4[1][1] << std::endl;
+
+    debugV( "This is a debug message" );
    
     debugV( ex1 );
     debugV( ex2 );
@@ -47,4 +53,7 @@ int main( int, char** )
     debugV( v );
 
     debugM( "Test/demo is complete" );
+
+    // Make sure compiler doesn't strip out loop above when optimizing
+    std::cout << "v[1]: " << v[1] << std::endl;
 }
