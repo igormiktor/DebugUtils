@@ -20,8 +20,8 @@ There is no preprocessor selected code generation in DebugUtils.  The selection 
 and function overloading.  Certain template specializations and function overloads 
 generate debugging code; other template specializations and function overloads generate no code.
 
-When compiled on GCC v13 with -O2 and `DEBUGUTILS_ON=0`, code size is exactly the same as when all 
-DebugUtils debugging calls are manual editted out from the source code.
+When compiled on GCC v13 with -O2 and `DEBUGUTILS_ON=0`, code size is exactly the same as when `#include "DebugUtils.hpp"` 
+as well as all calls to DebugUtils functions and/or macros are manual editted out from the source code.
 
 Variadic template functions allow as many variables to be output as desired.  Template recursion
 enables the debug printing of complex nested data types and data structures (e.g., vectors of pairs, 
