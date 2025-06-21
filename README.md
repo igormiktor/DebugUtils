@@ -6,8 +6,7 @@ from your code when disabled.
 The turning on/off of debugging code is driven by policy types that trigger template specialization and 
 function overloading that generate debugging code when requested and no code when not requested.
 
-Debugging code using policy types that drive template specialization and function overloading 
-that generate debugging code when requested and no code not requested.  C++20 is required.
+**C++20 is required.**
 
 Debug code generation is selected by `#define DEBUGUTILS_ON` to be non-zero at compile time.  
 
