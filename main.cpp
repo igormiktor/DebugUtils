@@ -14,6 +14,7 @@ int main( int, char** )
     std::cout << "C++ version is " << __cplusplus << std::endl;
     std::cout << "DebugUtils is " << ( DEBUGUTILS_ON ? "ON" : "OFF" ) << std::endl;
 
+    // Comment the next line out to send debug output to std::cerr
     DebugUtils::DebugFileOn debugFileEnabled( "Test_Log" );  
     // Above line could be replace by macro: logDebugToFile( "Test_Log" ) 
 

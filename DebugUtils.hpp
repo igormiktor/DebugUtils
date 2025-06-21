@@ -2,14 +2,17 @@
     DebuggingUtils,hpp   
     
     Debugging code using policy types that drive template specialization and function overloading 
-    that generate debugging code when requested and no code not requested.  
+    that generate debugging code when requested and no code when not requested.  C++20 is required.
     
     Debug code generation is selected by #define DEBUGUTILS_ON to be non-zero at compile time.  
 
-    There is no preprocessor selected code generation.  All the selection of what code is generated 
-    (or not generated) is governed by template specialization (helped along by type inference by the 
-    compiler) and function overloading.  Certain template specializations and function overloads 
+    There is no preprocessor selected code generation.  The selection of what code is generated 
+    (or not generated) is entirely governed by template specialization (helped along by type inference 
+    by the compiler) and function overloading.  Certain template specializations and function overloads 
     generate debugging code; other template specializations and function overloads generate no code.
+
+    When compiled on GCC v13 with -O2 and DEBUGUTILS_ON=0, code size is exactly the same as when all 
+    DebugUtils debugging calls are manual editted out from the source code.
 
     Varidic template functions allow as many variables to be output as desired.  Template recursion
     enables the debug printing of complex nested data types and data structures (e.g., vectors of pairs, 
