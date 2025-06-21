@@ -144,6 +144,7 @@ namespace DebugUtils
                 }
                 else
                 {
+                    // In case of error, std:cerr remains as it was
                     std::cerr << "Unable to open debug logging file " << fn << std::endl;
                 }
             }
