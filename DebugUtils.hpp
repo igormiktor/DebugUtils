@@ -345,6 +345,19 @@ namespace DebugUtils
     {
         debugPrinter( DebugUtilsPolicy{}, filename, lineNbr, names, std::forward<T>( head ), std::forward<V>( tail )... );
     }
+ 
+    // Function overload actually called in user code that triggers selection of debug/non-debug versions, conditional version
+    template <typename T, typename... V>
+    void debugPrinter( bool active, const char* filename, int lineNbr, const char* names, T&& head, V&&... tail )
+    {
+        if constexpr( std::is_convertible<DebugUtilsPolicy, std::true_type>::value )
+        {
+            if ( active )
+            {
+                debugPrinter( DebugUtilsPolicy{}, filename, lineNbr, names, std::forward<T>( head ), std::forward<V>( tail )... );
+            }
+        }
+    }
 
 
     //*** debugPrinterArr() variants
@@ -356,7 +369,7 @@ namespace DebugUtils
         std::cerr << std::filesystem::path{ filename }.filename().string() << "(" << lineNbr << ") [ ", printerArr( names, arr, n, tail... );
     }
 
-   // Non-debugging version overload
+    // Non-debugging version overload
     template <typename T, typename... V>
     constexpr void debugPrinterArr( std::false_type, const char* filename, int lineNbr, const char* names, T arr[], size_t n, V... tail ) {}
 
@@ -365,6 +378,19 @@ namespace DebugUtils
     void debugPrinterArr( const char* filename, int lineNbr, const char* names, T arr[], size_t n, V... tail )
     { 
         debugPrinterArr( DebugUtilsPolicy{}, filename, lineNbr, names, arr, n, tail... );
+    }
+
+    // Function overload actually called in user code that triggers selection of debug/non-debug versions, conditional version
+    template <typename T, typename... V>
+    void debugPrinterArr( bool active, const char* filename, int lineNbr, const char* names, T arr[], size_t n, V... tail )
+    { 
+        if constexpr( std::is_convertible<DebugUtilsPolicy, std::true_type>::value )
+        {
+            if ( active )
+            {
+                debugPrinterArr( DebugUtilsPolicy{}, filename, lineNbr, names, arr, n, tail... );
+            }
+        }
     }
 
 
@@ -390,6 +416,20 @@ namespace DebugUtils
         debugMsg( DebugUtilsPolicy{}, filename, lineNbr, std::forward<T>( output ) );
     }
 
+    // Function overload actually called in user code that triggers selection of debug/non-debug versions, conditional version
+    template <typename T>
+    void debugMsg( bool active, const char* filename, int lineNbr, T&& output )
+    {
+        if constexpr( std::is_convertible<DebugUtilsPolicy, std::true_type>::value )
+        {
+            if ( active )
+            {
+                debugMsg( DebugUtilsPolicy{}, filename, lineNbr, std::forward<T>( output ) );
+            }
+        }
+    }
+
+
 }   // namespace DebugUtils
 
 
@@ -397,6 +437,11 @@ namespace DebugUtils
 #define debugV(...)         DebugUtils::debugPrinter( __FILE__,  __LINE__, #__VA_ARGS__, __VA_ARGS__ )
 #define debugArr(...)       DebugUtils::debugPrinterArr( __FILE__,  __LINE__, #__VA_ARGS__, __VA_ARGS__ )
 #define debugM( msg )       DebugUtils::debugMsg( __FILE__,  __LINE__, msg )
+
+// Convenience macros for conditional debugging
+#define debugCondV( active, ...)    DebugUtils::debugPrinter( active, __FILE__,  __LINE__, #__VA_ARGS__, __VA_ARGS__ )
+#define debugCondArr( active, ...)  DebugUtils::debugPrinterArr( active, __FILE__,  __LINE__, #__VA_ARGS__, __VA_ARGS__ )
+#define debugCondM( active, msg )   DebugUtils::debugMsg( active, __FILE__,  __LINE__, msg )
 
 // Convenience macro to instantiate a file to log all the debug output
 #define logDebugToFile( filename )      DebugUtils::DebugFileOn debugEnabled( filename )

@@ -17,7 +17,7 @@ int main( int, char** )
     std::cout << "DebugUtils is " << ( DEBUGUTILS_ON ? "ON" : "OFF" ) << std::endl;
 
     // Comment out the next line to send debug output to std::cerr
-    DebugUtils::DebugFileOn debugFileEnabled( "Test_Log" );  
+//    DebugUtils::DebugFileOn debugFileEnabled( "Test_Log" );  
     // Above line could be replace by macro: logDebugToFile( "Test_Log" ) 
 
     std::string ex1 = "Test string";
@@ -52,6 +52,14 @@ int main( int, char** )
     }
     debugV( v );
 
+    // Conditional debugging stuff (change to false to turn off the following debug statements)
+    auto includeThisDebug{ true };
+
+    debugCondM( includeThisDebug, "This is a conditional debug message");
+    debugCondV( includeThisDebug, ex1, ex2 );
+    // End conditional debugging examples
+
+    // Finished
     debugM( "Test/demo is complete" );
 
     // Make sure compiler doesn't strip out loop above when optimizing
