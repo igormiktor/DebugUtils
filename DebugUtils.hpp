@@ -285,10 +285,10 @@ namespace DebugUtils
                 bracket--;
         }
         std::cerr.write( names, i ) << " = ";
-        print( head );
+        print( std::forward<T>( head ) );
         if constexpr ( sizeof...(tail) )
         {
-            std::cerr << " ||", printer( names + i + 1, tail... );
+            std::cerr << " ||", printer( names + i + 1, std::forward<V>( tail )... );
         }
         else
         {    
@@ -331,7 +331,8 @@ namespace DebugUtils
     template <typename T, typename... V>
     void debugPrinter( std::true_type, const char* filename, int lineNbr, const char* names, T&& head, V&&... tail )
     {
-        std::cerr << std::filesystem::path{ filename }.filename().string() << "(" << lineNbr << ") [ ", printer( names, head, tail... );
+        std::cerr << std::filesystem::path{ filename }.filename().string() << "(" << lineNbr << ") [ ", 
+            printer( names, std::forward<T>( head ), std::forward<V>( tail )... );
     }
 
     // Non-debugging version overload, an empty function
@@ -342,7 +343,7 @@ namespace DebugUtils
     template <typename T, typename... V>
     void debugPrinter( const char* filename, int lineNbr, const char* names, T&& head, V&&... tail )
     {
-        debugPrinter( DebugUtilsPolicy{}, filename, lineNbr, names, head, tail... );
+        debugPrinter( DebugUtilsPolicy{}, filename, lineNbr, names, std::forward<T>( head ), std::forward<V>( tail )... );
     }
 
 
@@ -373,20 +374,20 @@ namespace DebugUtils
 
     // Debugging version overload
     template<typename T>
-    void debugMsg( std::true_type, const char* filename, int lineNbr, T output )
+    void debugMsg( std::true_type, const char* filename, int lineNbr, T&& output )
     {
         std::cerr << std::filesystem::path{ filename }.filename().string() << "(" << lineNbr << "): " << output << std::endl;
     }
 
     // Non-debuging version overload
     template<typename T>
-    constexpr void debugMsg( std::false_type, const char*,  int, T ) {}
+    constexpr void debugMsg( std::false_type, const char*,  int, T&& ) {}
 
     // Function overload actually called in user code that triggers selection of debug/non-debug versions
     template <typename T>
-    void debugMsg( const char* filename, int lineNbr, T msg )
+    void debugMsg( const char* filename, int lineNbr, T&& output )
     {
-        debugMsg( DebugUtilsPolicy{}, filename, lineNbr, msg );
+        debugMsg( DebugUtilsPolicy{}, filename, lineNbr, std::forward<T>( output ) );
     }
 
 }   // namespace DebugUtils
