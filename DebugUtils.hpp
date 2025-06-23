@@ -350,7 +350,7 @@ namespace DebugUtils
     template <typename T, typename... V>
     void debugPrinter( bool active, const char* filename, int lineNbr, const char* names, T&& head, V&&... tail )
     {
-        if constexpr( std::is_convertible<DebugUtilsPolicy, std::true_type>::value )
+        if constexpr ( std::is_convertible<DebugUtilsPolicy, std::true_type>::value )
         {
             if ( active )
             {
@@ -384,7 +384,7 @@ namespace DebugUtils
     template <typename T, typename... V>
     void debugPrinterArr( bool active, const char* filename, int lineNbr, const char* names, T arr[], size_t n, V... tail )
     { 
-        if constexpr( std::is_convertible<DebugUtilsPolicy, std::true_type>::value )
+        if constexpr ( std::is_convertible<DebugUtilsPolicy, std::true_type>::value )
         {
             if ( active )
             {
@@ -420,7 +420,7 @@ namespace DebugUtils
     template <typename T>
     void debugMsg( bool active, const char* filename, int lineNbr, T&& output )
     {
-        if constexpr( std::is_convertible<DebugUtilsPolicy, std::true_type>::value )
+        if constexpr ( std::is_convertible<DebugUtilsPolicy, std::true_type>::value )
         {
             if ( active )
             {
