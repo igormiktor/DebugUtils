@@ -17,7 +17,7 @@ int main( int, char** )
     std::cout << "DebugUtils is " << ( DEBUGUTILS_ON ? "ON" : "OFF" ) << std::endl;
 
     // Comment out the next line to send debug output to std::cerr
-//    DebugUtils::DebugFileOn debugFileEnabled( "Test_Log" );  
+    DebugUtils::DebugFileOn debugFileEnabled( "Test_Log" );  
     // Above line could be replace by macro: logDebugToFile( "Test_Log" ) 
 
     std::string ex1 = "Test string";
