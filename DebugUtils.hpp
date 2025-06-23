@@ -274,7 +274,7 @@ namespace DebugUtils
     // The "tail" argument(s) is/are passed back to the printer() 
     // function (but with one less argument to trigger the template recursion)
     template <typename T, typename... V>
-    void printer( const char* names, T&& head, V&&... tail )
+    void printerV( const char* names, T&& head, V&&... tail )
     {
         int i{ 0 };
         for ( int bracket = 0; names[i] != '\0' and ( names[i] != ',' or bracket > 0 ); i++ )
@@ -288,7 +288,7 @@ namespace DebugUtils
         print( std::forward<T>( head ) );
         if constexpr ( sizeof...(tail) )
         {
-            std::cerr << " ||", printer( names + i + 1, std::forward<V>( tail )... );
+            std::cerr << " ||", printerV( names + i + 1, std::forward<V>( tail )... );
         }
         else
         {    
@@ -329,32 +329,32 @@ namespace DebugUtils
 
     // Debugging version overload
     template <typename T, typename... V>
-    void debugPrinter( std::true_type, const char* filename, int lineNbr, const char* names, T&& head, V&&... tail )
+    void debugPrinterV( std::true_type, const char* filename, int lineNbr, const char* names, T&& head, V&&... tail )
     {
         std::cerr << std::filesystem::path{ filename }.filename().string() << "(" << lineNbr << ") [ ", 
-            printer( names, std::forward<T>( head ), std::forward<V>( tail )... );
+            printerV( names, std::forward<T>( head ), std::forward<V>( tail )... );
     }
 
     // Non-debugging version overload, an empty function
     template <typename T, typename... V>
-    constexpr void debugPrinter( std::false_type, const char* filename, int lineNbr, const char* names, T&& head, V&&... tail ) {}
+    constexpr void debugPrinterV( std::false_type, const char* filename, int lineNbr, const char* names, T&& head, V&&... tail ) {}
  
     // Function overload actually called in user code that triggers selection of debug/non-debug versions
     template <typename T, typename... V>
-    void debugPrinter( const char* filename, int lineNbr, const char* names, T&& head, V&&... tail )
+    void debugPrinterV( const char* filename, int lineNbr, const char* names, T&& head, V&&... tail )
     {
-        debugPrinter( DebugUtilsPolicy{}, filename, lineNbr, names, std::forward<T>( head ), std::forward<V>( tail )... );
+        debugPrinterV( DebugUtilsPolicy{}, filename, lineNbr, names, std::forward<T>( head ), std::forward<V>( tail )... );
     }
  
     // Function overload actually called in user code that triggers selection of debug/non-debug versions, conditional version
     template <typename T, typename... V>
-    void debugPrinter( bool active, const char* filename, int lineNbr, const char* names, T&& head, V&&... tail )
+    void debugPrinterV( bool active, const char* filename, int lineNbr, const char* names, T&& head, V&&... tail )
     {
         if constexpr ( std::is_convertible<DebugUtilsPolicy, std::true_type>::value )
         {
             if ( active )
             {
-                debugPrinter( DebugUtilsPolicy{}, filename, lineNbr, names, std::forward<T>( head ), std::forward<V>( tail )... );
+                debugPrinterV( DebugUtilsPolicy{}, filename, lineNbr, names, std::forward<T>( head ), std::forward<V>( tail )... );
             }
         }
     }
@@ -434,12 +434,12 @@ namespace DebugUtils
 
 
 // Convenience macros to provide __FILE__, __LINE__ and the catenation of variable names
-#define debugV(...)         DebugUtils::debugPrinter( __FILE__,  __LINE__, #__VA_ARGS__, __VA_ARGS__ )
+#define debugV(...)         DebugUtils::debugPrinterV( __FILE__,  __LINE__, #__VA_ARGS__, __VA_ARGS__ )
 #define debugArr(...)       DebugUtils::debugPrinterArr( __FILE__,  __LINE__, #__VA_ARGS__, __VA_ARGS__ )
 #define debugM( msg )       DebugUtils::debugMsg( __FILE__,  __LINE__, msg )
 
 // Convenience macros for conditional debugging
-#define debugCondV( active, ...)    DebugUtils::debugPrinter( active, __FILE__,  __LINE__, #__VA_ARGS__, __VA_ARGS__ )
+#define debugCondV( active, ...)    DebugUtils::debugPrinterV( active, __FILE__,  __LINE__, #__VA_ARGS__, __VA_ARGS__ )
 #define debugCondArr( active, ...)  DebugUtils::debugPrinterArr( active, __FILE__,  __LINE__, #__VA_ARGS__, __VA_ARGS__ )
 #define debugCondM( active, msg )   DebugUtils::debugMsg( active, __FILE__,  __LINE__, msg )
 
